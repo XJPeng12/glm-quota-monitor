@@ -60,10 +60,12 @@
 | `credentialRef` | `ZAI_CODING_CN_API_KEY` | 凭据库中的 Key 名 |
 | `endpoint` | `https://open.bigmodel.cn/api/monitor/usage/quota/limit` | 上游接口（仅接受 https） |
 
+> ⚠️ **不要把 Key 写进 `apiKey`**：该字段是明文落在 profile 配置文件里的，能读 profile 目录的人就能看到。首选默认行为——通过 `credentialRef` 从 DSH 凭据库解析，Key 只存在凭据库中，配置文件保持干净。
+
 ## 工作原理
 
-- Host 半（`index.js`）注册同源路由 `GET /glm-quota-v<版本>`：每次请求实时调智谱 monitor 接口并归一化，带 Origin 校验（拒绝跨站浏览器请求）；同时注册 `glm_quota_check` Agent 工具
-- Client 半（`client.js`）注册两个槽位：`settings.section`（设置页）与 `conversation.composer.dock`（极简 dock），共享一个页面级取数 store，自动刷新频率存于 localStorage
+- Host 半（`index.js`）注册同源路由 `GET /glm-quota-usage`（固定路径；响应体里的 `v` 字段标记当前运行的版本代次）：每次请求实时调智谱 monitor 接口并归一化，带 Origin 校验（拒绝跨站浏览器请求）；同时注册 `glm_quota_check` Agent 工具
+- Client 半（`client.js`）注册两个槽位：`settings.section`（设置页）与 `conversation.composer.dock`（极简 dock），共享一个页面级取数 store，自动刷新频率存于 localStorage；倒计时每 30 秒重绘一次，取数频率可独立设置
 - 样式仅使用 `--dsw-alias-*` 主题 token，跟随宿主明暗主题
 
 ## 卸载

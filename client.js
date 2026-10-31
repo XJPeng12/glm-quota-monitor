@@ -19,8 +19,7 @@ window.__ModuleLoader__.load({
     const React = require('react');
     const h = React.createElement;
 
-    const VERSION = '1.0.5';
-    const ROUTE_PATH = '/glm-quota-v' + VERSION.replace(/\W/g, '');
+    const ROUTE_PATH = '/glm-quota-usage';
 
     const FREQ_KEY = 'glm-quota-monitor.refreshMs';
     const DEFAULT_FREQ = 5 * 60 * 1000;
@@ -231,6 +230,11 @@ window.__ModuleLoader__.load({
         startStore();
         const un = subscribeStore(force);
         return un;
+      }, []);
+      // Re-render every 30s so reset countdowns stay fresh between polls.
+      React.useEffect(() => {
+        const timer = setInterval(force, 30000);
+        return () => clearInterval(timer);
       }, []);
       return {
         phase: store.phase,

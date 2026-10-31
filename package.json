@@ -1,6 +1,6 @@
 {
   "name": "@local/glm-quota-monitor",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "private": true,
   "description": "GLM Coding Plan quota monitor: ambient quota widget plus an agent tool.",
   "type": "module",

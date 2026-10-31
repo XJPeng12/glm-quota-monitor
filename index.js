@@ -12,8 +12,10 @@
 const DEFAULT_ENDPOINT = 'https://open.bigmodel.cn/api/monitor/usage/quota/limit';
 const DEFAULT_CREDENTIAL_REF = 'ZAI_CODING_CN_API_KEY';
 const UPSTREAM_TIMEOUT_MS = 15000;
-const VERSION = '1.0.5';
-const ROUTE_PATH = '/glm-quota-v' + VERSION.replace(/\W/g, '');
+const VERSION = '1.0.6';
+// Fixed path (no version suffix): stable across updates; the live generation
+// marker is the `v` field in the response body.
+const ROUTE_PATH = '/glm-quota-usage';
 
 /** Optional services: the plugin stays inactive when any is missing. */
 export const inject = ['credentials', 'webServer', 'tools'];
@@ -163,10 +165,19 @@ export function apply(ctx, config) {
   const safeOrigin = () => {
     try {
       return ctx.webServer.getOrigin();
-    } catch {
+    } catch (error) {
+      // Degrades to "no origin check" — acceptable on a loopback listener,
+      // but log it so a misconfiguration is visible.
+      ctx.logger?.warn?.(
+        'glm-quota-monitor: getOrigin() failed, cross-origin check skipped: ' +
+          (error instanceof Error ? error.message : String(error)),
+      );
       return undefined;
     }
   };
+
+  let disposeTool;
+  const diagnostics = {};
 
   const disposeRoute = ctx.webServer.register({
     kind: 'exact',
@@ -197,8 +208,6 @@ export function apply(ctx, config) {
   // Same snapshot as an agent tool. Registration is guarded: a failure is
   // recorded and surfaced through the route's diagnostic field instead of
   // failing the whole plugin activation.
-  let disposeTool;
-  const diagnostics = {};
   try {
     disposeTool = ctx.tools.register({
       name: 'glm_quota_check',

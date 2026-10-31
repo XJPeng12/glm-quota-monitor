@@ -1,0 +1,4 @@
+- insert:
+    - id: glm-quota-monitor
+      name: '@local/glm-quota-monitor'
+      config: {}

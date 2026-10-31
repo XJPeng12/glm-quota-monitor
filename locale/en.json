@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "GLM Quota Monitor",
+    "description": "A settings page (left column) with full GLM Coding Plan quota details — plan level, per-window usage and remaining, reset times and countdowns, tool breakdown — while the composer dock shows only remaining quota and time until reset. Also exposes the glm_quota_check agent tool."
+  }
+}
